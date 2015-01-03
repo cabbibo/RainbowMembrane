@@ -32,7 +32,10 @@
     <script src = "RepelerMesh.js"                ></script>
     <script src = "GEM.js"                        ></script>
     <script src = "GUI.js"                        ></script>
-    
+
+    <script src = "Tone.js">                      ></script>
+    <script src = "initTones.js">                 ></script>
+
     <script>
 
 
@@ -57,6 +60,7 @@
 
 
 
+      var tones;
       var camera, renderer, scene , controls;
       
       var vs, fs;
@@ -66,6 +70,7 @@
       var gems = [];
       var raycaster = new THREE.Raycaster(); 
 
+      var soundPos = new THREE.Vector3();
 
       var controller = new Leap.Controller();
       controller.setOptimizeHMD(true);
@@ -79,10 +84,10 @@
         looping: true 
       });*/
 
-      var audio = new UserAudio( audioController );
+      //var audio = new UserAudio( audioController );
 
 
-      audioController.mute.gain.value = 0;
+      //audioController.mute.gain.value = 0;
 
       G.t_audio.value = audioController.texture;
 
@@ -117,6 +122,8 @@
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, .01, 1000 );
         camera.position.z = .1;
         camera.lookAt( new THREE.Vector3( 0 , 0 , -1 ) );
+
+        initTones();
 
         /*controls = new THREE.OrbitControls( camera );
         controls.minPolarAngle = -Math.PI * .5;
@@ -175,140 +182,7 @@
 
         }
  
-        /*for(var i = 0; i < 50; i++ ){
-
-          var mesh = new THREE.Mesh( g , m  );
-          REPELERS.push( mesh );
-
-          scene.add( mesh );
-
-
-        }*/
-
-
-
-
-       /* t = new THREE.Mesh( new THREE.IcosahedronGeometry( .5 , 6 ) );
-
-        //t.position.z = 2;
-
-        t.position.z = -.8;
-        t.position.y = 0;
-        t.updateMatrix();
-
-        var rep = G.fingers.value;
-
-        console.log( rep );
-        //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
-        gem = new RepelerMesh( 'Parameters' , t, REPELERS , {
-          
-          vs: shaders.vertexShaders.sem,
-          fs: shaders.fragmentShaders.sem,
-      
-          soul:{
-
-            repulsionPower:     { type:"f" , value: -.0002 , constraints:[-300  , 0] },
-            repulsionRadius:     { type:"f" , value: .1 , constraints:[ 0  , 1000] },
-          },
-
-          body:{
-            //t_refl:{type:"t" , value:reflectionCube},
-            //t_refr:{type:"t" , value:reflectionCube },
-            custom1:{type:"f" , value:.9 , constraints:[ .8 , 1 ]},
-            t_sem:{type:"t" , value: matcap }
-          }
-
-        }); 
-
-        gem.soul.reset( gem.t_og.value );
-        gem.toggle();
-
-        gems.push( gem );
-
-
-        t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 40 , 40 , 40 ) );
-
-        //t.position.z = 2;
-
-        t.position.z = 0;
-        t.position.y = .8;
-        t.rotation.x = Math.PI * .25;
-        t.rotation.y = Math.PI * .25;
-        t.rotation.z = Math.PI * .25;
-        t.updateMatrix();
-
-        var rep = G.fingers.value;
-
-        console.log( rep );
-        //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
-        gem = new RepelerMesh( 'Parameters' , t, REPELERS , {
-          
-          vs: shaders.vertexShaders.sem,
-          fs: shaders.fragmentShaders.sem,
-      
-          soul:{
-
-            repulsionPower:     { type:"f" , value: -.0002 , constraints:[-300  , 0] },
-            repulsionRadius:     { type:"f" , value: .1 , constraints:[ 0  , 1000] },
-          },
-
-          body:{
-            //t_refl:{type:"t" , value:reflectionCube},
-            //t_refr:{type:"t" , value:reflectionCube },
-            custom1:{type:"f" , value:.9 , constraints:[ .8 , 1 ]},
-            t_sem:{type:"t" , value: matcap }
-          }
-
-        }); 
-
-        gem.soul.reset( gem.t_og.value );
-        gem.toggle();
-
-        gems.push( gem );
-
        
-        
-        t = new THREE.Mesh( new THREE.CylinderGeometry( .5 , 0 , 1 , 40 , 40 , 40 ) );
-
-        //t.position.z = 2;
-
-        t.position.z = 0;
-        t.position.y = -.6;
-        t.rotation.x = Math.PI * .25;
-        t.rotation.y = Math.PI * .25;
-        t.rotation.z = Math.PI * .25;
-        t.updateMatrix();
-
-        var rep = G.fingers.value;
-
-        console.log( rep );
-        //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
-        gem = new RepelerMesh( 'Parameters' , t, REPELERS , {
-          
-          vs: shaders.vertexShaders.sem,
-          fs: shaders.fragmentShaders.sem,
-      
-          soul:{
-
-            repulsionPower:     { type:"f" , value: -.0002 , constraints:[-300  , 0] },
-            repulsionRadius:     { type:"f" , value: .1 , constraints:[ 0  , 1000] },
-          },
-
-          body:{
-            //t_refl:{type:"t" , value:reflectionCube},
-            //t_refr:{type:"t" , value:reflectionCube },
-            custom1:{type:"f" , value:.9 , constraints:[ .8 , 1 ]},
-            t_sem:{type:"t" , value: matcap }
-          }
-
-        }); 
-
-        gem.soul.reset( gem.t_og.value );
-        gem.toggle();
-
-        gems.push( gem );*/
-
-
 
           t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
 
@@ -370,7 +244,7 @@
             gems[i].update();
           }
           
-          //cube.position.copy( G.fingers.value[4] );
+          soundPos.copy( G.fingers.value[4] );
           
           audioController.update();
           
