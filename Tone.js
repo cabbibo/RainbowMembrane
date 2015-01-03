@@ -33,7 +33,7 @@ Tone.prototype.update = function(){
   //
     tv1.copy( this.position );
     tv1.sub( soundPos );
-    this.gain.gain.value = .1 / tv1.length();
+    this.gain.gain.value = Math.min( 1 , .1 / tv1.length() );
 
   }
 

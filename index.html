@@ -42,14 +42,18 @@
 
       var tv1 = new THREE.Vector3();
       var tv2 = new THREE.Vector3();
-      var matcap = THREE.ImageUtils.loadTexture('img/rough-aluminium.jpg');
+      var matcapTurq = THREE.ImageUtils.loadTexture('img/matcap/turq.jpg');//rough-aluminium.jpg');
+      var matcapBlood = THREE.ImageUtils.loadTexture('img/matcap/blood.jpg');//rough-aluminium.jpg');
+      var matcapDark = THREE.ImageUtils.loadTexture('img/matcap/dark.jpg');//rough-aluminium.jpg');
+      var matcapMetal = THREE.ImageUtils.loadTexture('img/matcap/metal.jpg');//rough-aluminium.jpg');
 
       var counter = 0;
       var G = {
 
         dT:{type:"f" , value:0},
         time:{type:"f" , value:0},
-        t_matcap:{ type:"t" , value: matcap },
+        t_matcap:{ type:"t" , value: matcapDark },
+        t_blood:{ type:"t" , value: matcapDark },
         fogColor:{ type:"v3" , value: new THREE.Vector3() },
         t_audio:{type:"t",value:null},
         fingers:{ type:"v3", value:[] }
@@ -87,7 +91,8 @@
       //var audio = new UserAudio( audioController );
 
 
-      //audioController.mute.gain.value = 0;
+      audioController.mute.gain.value = 0;
+
 
       G.t_audio.value = audioController.texture;
 
@@ -109,6 +114,9 @@
       
       shaders.load( 'vs-sem'  , 'sem' , 'vertex' );
       shaders.load( 'fs-sem' , 'sem' , 'fragment' );
+
+      shaders.load( 'vs-flesh'  , 'flesh' , 'vertex' );
+      shaders.load( 'fs-flesh' , 'flesh' , 'fragment' );
 
 
 
@@ -181,14 +189,12 @@
           mesh.position.z = (Math.random() - .5 ) * 5;
 
         }
- 
-       
 
-          t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
+        t = new THREE.Mesh( new THREE.IcosahedronGeometry( .1 , 5 ) );
 
-        //t.position.z = 2;
+        t.position.z = -.3;
 
-             t.updateMatrix();
+        t.updateMatrix();
 
         var rep = G.fingers.value;
 
@@ -209,7 +215,44 @@
             //t_refl:{type:"t" , value:reflectionCube},
             //t_refr:{type:"t" , value:reflectionCube },
             custom1:{type:"f" , value:.9 , constraints:[ .8 , 1 ]},
-            t_sem:{type:"t" , value: matcap }
+            t_sem:{type:"t" , value: matcapMetal }
+          }
+
+        }); 
+
+        gem.soul.reset( gem.t_og.value );
+        gem.toggle();
+
+        gems.push( gem );
+
+       
+
+        t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
+
+        //t.position.z = 2;
+
+        t.updateMatrix();
+
+        var rep = G.fingers.value;
+
+        console.log( rep );
+        //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
+        gem = new RepelerMesh( 'Parameters' , t, REPELERS , {
+          
+          vs: shaders.vertexShaders.sem,
+          fs: shaders.fragmentShaders.sem,
+      
+          soul:{
+
+            repulsionPower:     { type:"f" , value: -.0002 , constraints:[-300  , 0] },
+            repulsionRadius:     { type:"f" , value: .1 , constraints:[ 0  , 1000] },
+          },
+
+          body:{
+            //t_refl:{type:"t" , value:reflectionCube},
+            //t_refr:{type:"t" , value:reflectionCube },
+            custom1:{type:"f" , value:.9 , constraints:[ .8 , 1 ]},
+            t_sem:{type:"t" , value: matcapMetal }
           }
 
         }); 
