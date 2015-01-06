@@ -27,13 +27,15 @@
     <script src = "lib/AudioController.js"        ></script>
     <script src = "lib/AudioTexture.js"           ></script>
     <script src = "lib/PositionalAudio.js"        ></script>
+    <script src = "lib/Loop.js"                   ></script>
     <script src = "lib/Looper.js"                 ></script>
+    
+    <script src = "lib/OBJLoader.js"              ></script>
 
     <script src = "RepelerMesh.js"                ></script>
     <script src = "GEM.js"                        ></script>
     <script src = "GUI.js"                        ></script>
 
-    <script src = "Tone.js">                      ></script>
     <script src = "initTones.js">                 ></script>
 
     <script>
@@ -46,6 +48,10 @@
       var matcapBlood = THREE.ImageUtils.loadTexture('img/matcap/blood.jpg');//rough-aluminium.jpg');
       var matcapDark = THREE.ImageUtils.loadTexture('img/matcap/dark.jpg');//rough-aluminium.jpg');
       var matcapMetal = THREE.ImageUtils.loadTexture('img/matcap/metal.jpg');//rough-aluminium.jpg');
+
+
+      var VR = true;
+
 
       var counter = 0;
       var G = {
@@ -62,6 +68,9 @@
 
       var REPELERS = [];
 
+      var loaded = 0;
+      var neededToLoad = 1;
+
 
 
       var tones;
@@ -77,7 +86,10 @@
       var soundPos = new THREE.Vector3();
 
       var controller = new Leap.Controller();
-      controller.setOptimizeHMD(true);
+      
+      if( VR == true ){
+        controller.setOptimizeHMD(true);
+      }
 
       var shaders = new ShaderLoader( 'shaders' , 'shaderChunks'   );
 
@@ -91,22 +103,21 @@
       //var audio = new UserAudio( audioController );
 
 
-      audioController.mute.gain.value = 0;
+     // audioController.mute.gain.value = 0;
 
 
       G.t_audio.value = audioController.texture;
 
        var looper = new Looper( audioController , G.time , {
 
-         beatsPerMinute: 141.45,
-         beatsPerMeasure: 8,
-         measuresPerLoop: 8
+         beatsPerMinute: 120,
+         beatsPerMeasure: 4,
+         measuresPerLoop: 4
 
       });
 
       shaders.shaderSetLoaded = function(){
-        init();
-        animate();
+        onLoad();
       }
 
 
@@ -119,6 +130,27 @@
       shaders.load( 'fs-flesh' , 'flesh' , 'fragment' );
 
 
+      /*var OBJLoader = new THREE.OBJLoader();
+
+      OBJLoader.load( 'models/skull.obj' , function( object ){
+
+      
+        object.traverse( function ( child ) {
+          if ( child instanceof THREE.Mesh ) {
+
+            var modifier = new THREE.SubdivisionModifier( 3 );
+            cockGeo = child.geometry;
+            cockGeo.computeFaceNormals();
+
+            modifier.modify( cockGeo );
+                      }
+        }.bind( this ));
+
+        onLoad();
+      });*/
+
+
+      var tones = initTones();
 
       function init(){
 
@@ -131,7 +163,6 @@
         camera.position.z = .1;
         camera.lookAt( new THREE.Vector3( 0 , 0 , -1 ) );
 
-        initTones();
 
         /*controls = new THREE.OrbitControls( camera );
         controls.minPolarAngle = -Math.PI * .5;
@@ -192,18 +223,29 @@
 
         t = new THREE.Mesh( new THREE.IcosahedronGeometry( .1 , 5 ) );
 
-        t.position.z = -.3;
+        t.position.z = .3;
 
         t.updateMatrix();
 
         var rep = G.fingers.value;
 
         console.log( rep );
+
+
+        
+
+        t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
+
+        //t.position.z = 2;
+
+        t.updateMatrix();
+
         //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
         gem = new RepelerMesh( 'Parameters' , t, REPELERS , {
           
           vs: shaders.vertexShaders.sem,
           fs: shaders.fragmentShaders.sem,
+
       
           soul:{
 
@@ -227,19 +269,29 @@
 
        
 
-        t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
+        /*t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
 
         //t.position.z = 2;
 
-        t.updateMatrix();
+        t.updateMatrix();*/
 
+       /* var t = new THREE.Mesh( cockGeo );
+
+        t.rotation.x = Math.PI / 2.7;
+        t.rotation.y = -Math.PI / 2;
+        t.position.z = -.35;
+        t.position.y = -.1;
+        t.scale.multiplyScalar( .06 );
+        t.updateMatrix();
         var rep = G.fingers.value;
 
         console.log( rep );
         //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
         gem = new RepelerMesh( 'Parameters' , t, REPELERS , {
+
           
           vs: shaders.vertexShaders.sem,
+
           fs: shaders.fragmentShaders.sem,
       
           soul:{
@@ -252,7 +304,8 @@
             //t_refl:{type:"t" , value:reflectionCube},
             //t_refr:{type:"t" , value:reflectionCube },
             custom1:{type:"f" , value:.9 , constraints:[ .8 , 1 ]},
-            t_sem:{type:"t" , value: matcapMetal }
+            t_sem:{type:"t" , value: matcapBlood }
+
           }
 
         }); 
@@ -260,14 +313,21 @@
         gem.soul.reset( gem.t_og.value );
         gem.toggle();
 
-        gems.push( gem );
+        gems.push( gem );*/
 
 
         controller.connect();
         
 
         looper.start();
- 
+        
+        for( var i =0; i < tones.length; i++ ){
+
+          console.log( tones[i] );
+          tones[i].play();
+
+          scene.add( tones[i].mesh );
+        } 
 
       }
 
@@ -337,13 +397,22 @@
 
           var p = leapToScene( frame , frame.hands[0].fingers[fI].positions[bI] );
 
-          // z is y || x is x ||  y is -z
-          tv1.set( -p[0] , -p[2] , -p[1] );
-          r.copy( camera.position );
-          tv1.applyQuaternion( camera.quaternion );
+          if( VR == true ){
+            
+            // z is y || x is x ||  y is -z
+            tv1.set( -p[0] , -p[2] , -p[1] );
+            r.copy( camera.position );
+            tv1.applyQuaternion( camera.quaternion );
+            r.add( tv1 );
 
+          }else{ 
 
-          r.add( tv1 );
+            r.copy( camera.position );
+            tv1.set( p[0] , p[1] -.3 , p[2] - .3 );
+            r.add( tv1 );
+
+          }
+          
 
         }
 
@@ -375,15 +444,22 @@
 
           var p = leapToScene( frame , frame.hands[1].fingers[fI].positions[bI] );
 
-          // z is y || x is x ||  y is -z
-          tv1.set( -p[0] , -p[2] , -p[1] );
-          r.copy( camera.position );
-          tv1.applyQuaternion( camera.quaternion );
+          if( VR == true ){
+            
+            // z is y || x is x ||  y is -z
+            tv1.set( -p[0] , -p[2] , -p[1] );
+            r.copy( camera.position );
+            tv1.applyQuaternion( camera.quaternion );
+            r.add( tv1 );
 
+          }else{ 
 
-          r.add( tv1 );
+            r.copy( camera.position );
+            tv1.set( p[0] , p[1] -.3 , p[2] - .3 );
+            r.add( tv1 );
 
         }
+      }
 
     }else{
          //console.
@@ -419,6 +495,16 @@
 
   }
 
+  function onLoad(){
+
+        loaded ++;
+        
+        if( loaded == neededToLoad ){
+          init();
+          animate();
+        }
+
+      }
 
 
     </script>
