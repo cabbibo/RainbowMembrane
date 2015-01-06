@@ -84,6 +84,7 @@
       var raycaster = new THREE.Raycaster(); 
 
       var soundPos = new THREE.Vector3();
+      var soundPos1 = new THREE.Vector3();
 
       var controller = new Leap.Controller();
       
@@ -348,6 +349,7 @@
           }
           
           soundPos.copy( G.fingers.value[4] );
+          soundPos1.copy( G.fingers.value[29] );
           
           audioController.update();
           
