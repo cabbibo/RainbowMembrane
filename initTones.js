@@ -17,6 +17,24 @@ function initTones( val ){
   ]
 
   var loops = [
+
+    /*'audio/grant/grant1.mp3', 
+    'audio/grant/grant2.mp3', 
+    'audio/grant/grant3.mp3', 
+    'audio/grant/grant4.mp3', 
+    'audio/grant/grant5.mp3', 
+    'audio/grant/grant6.mp3',
+    'audio/grant/grant1.mp3', 
+    'audio/grant/grant2.mp3', 
+    'audio/grant/grant3.mp3', 
+    'audio/grant/grant4.mp3', 
+    'audio/grant/grant5.mp3', 
+    'audio/grant/grant6.mp3',
+    'audio/grant/grant1.mp3', 
+    'audio/grant/grant2.mp3', 
+    'audio/grant/grant3.mp3', 
+    'audio/grant/grant4.mp3', */
+
     'audio/box1.wav', 
     'audio/box2.wav', 
     'audio/box3.wav', 
