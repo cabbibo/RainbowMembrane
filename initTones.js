@@ -8,9 +8,9 @@ function initTones( val ){
   var dir = [
 
     [ 0 ,  0 , -1 ],
-    [ 0 ,  0 ,  1 ],
     [ 1 ,  0 ,  0 ],
     [-1 ,  0 ,  0 ],
+    [ 0 ,  0 ,  1 ],
     [ 0 ,  1 ,  0 ],
     [ 0 , -1 ,  0 ],
 
@@ -18,44 +18,20 @@ function initTones( val ){
 
   var loops = [
 
-    /*'audio/grant/grant1.mp3', 
-    'audio/grant/grant2.mp3', 
-    'audio/grant/grant3.mp3', 
-    'audio/grant/grant4.mp3', 
-    'audio/grant/grant5.mp3', 
-    'audio/grant/grant6.mp3',
-    'audio/grant/grant1.mp3', 
-    'audio/grant/grant2.mp3', 
-    'audio/grant/grant3.mp3', 
-    'audio/grant/grant4.mp3', 
-    'audio/grant/grant5.mp3', 
-    'audio/grant/grant6.mp3',
-    'audio/grant/grant1.mp3', 
-    'audio/grant/grant2.mp3', 
-    'audio/grant/grant3.mp3', 
-    'audio/grant/grant4.mp3', */
-
-    'audio/box1.wav', 
-    'audio/box2.wav', 
-    'audio/box3.wav', 
-    'audio/box4.wav', 
-    'audio/box5.wav', 
-    'audio/box6.wav',
-    'audio/box7.wav',
-    'audio/box8.wav',
-    'audio/box9.wav',
-    'audio/box10.wav',
-    'audio/box11.wav',
-    'audio/box12.wav',
-    'audio/box13.wav',
-    'audio/box14.wav',
-    'audio/box15.wav',
-    'audio/box16.wav',
+    //'grant',
+    'dark',
+    'glory',
+    'dark',
+    'glory',
+    'dark',
+    'glory',
+    //'grant',
+ 
   ]
 
   var numOf = 4;
 
-  for( var i  = 0; i < 1; i++ ){
+  for( var i  = 0; i < 6; i++ ){
 
     for( var j = 0; j < numOf; j++ ){
       for( var k = 0; k < numOf; k++ ){
@@ -90,7 +66,9 @@ function initTones( val ){
         var v = (j+1) * 20;
         var pos = new THREE.Vector3( x , y , z );
 
-        var loop = loops[ j * numOf + k];
+
+        var num = (j * numOf + k)+1;
+        var loop = 'audio/'+loops[i]+ '/'+num+'.mp3';
         neededToLoad++;
         tones.push( new Loop( audioController , loop , .1 , pos ) );
 

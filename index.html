@@ -40,17 +40,17 @@
 
     <script>
 
-
+      
+      var VR = true;
+      var AUDIO = false;
 
       var tv1 = new THREE.Vector3();
       var tv2 = new THREE.Vector3();
-      var matcapTurq = THREE.ImageUtils.loadTexture('img/matcap/turq.jpg');//rough-aluminium.jpg');
-      var matcapBlood = THREE.ImageUtils.loadTexture('img/matcap/blood.jpg');//rough-aluminium.jpg');
-      var matcapDark = THREE.ImageUtils.loadTexture('img/matcap/dark.jpg');//rough-aluminium.jpg');
-      var matcapMetal = THREE.ImageUtils.loadTexture('img/matcap/metal.jpg');//rough-aluminium.jpg');
 
-
-      var VR = false;
+      var matcapTurq  = THREE.ImageUtils.loadTexture( 'img/matcap/turq.jpg'  );
+      var matcapBlood = THREE.ImageUtils.loadTexture( 'img/matcap/blood.jpg' );
+      var matcapDark  = THREE.ImageUtils.loadTexture( 'img/matcap/dark.jpg'  );
+      var matcapMetal = THREE.ImageUtils.loadTexture( 'img/matcap/metal.jpg' );
 
 
       var counter = 0;
@@ -69,7 +69,7 @@
       var REPELERS = [];
 
       var loaded = 0;
-      var neededToLoad = 1;
+      var neededToLoad = 2;
 
 
 
@@ -94,28 +94,30 @@
 
       var shaders = new ShaderLoader( 'shaders' , 'shaderChunks'   );
 
-      
-      var audioController = new AudioController();
+      if( AUDIO == true ){
+
+        var audioController = new AudioController();
     
-     /* var audio = new PositionalAudio( audioController , 'audio/beyondLoop.wav' ,{
-        looping: true 
-      });*/
+        /* var audio = new PositionalAudio( audioController , 'audio/beyondLoop.wav' ,{
+          looping: true 
+        });*/
 
-      //var audio = new UserAudio( audioController );
-
-
-     // audioController.mute.gain.value = 0;
+        //var audio = new UserAudio( audioController );
 
 
-      G.t_audio.value = audioController.texture;
+        //audioController.mute.gain.value = 0;
+        G.t_audio.value = audioController.texture;
 
-       var looper = new Looper( audioController , G.time , {
 
-         beatsPerMinute: 120,
-         beatsPerMeasure: 4,
-         measuresPerLoop: 4
+        var looper = new Looper( audioController , G.time , {
 
-      });
+          beatsPerMinute: 120,
+          beatsPerMeasure: 4,
+          measuresPerLoop: 4
+
+        });
+
+      }
 
       shaders.shaderSetLoaded = function(){
         onLoad();
@@ -131,15 +133,16 @@
       shaders.load( 'fs-flesh' , 'flesh' , 'fragment' );
 
 
-      /*var OBJLoader = new THREE.OBJLoader();
+      var OBJLoader = new THREE.OBJLoader();
 
-      OBJLoader.load( 'models/skull.obj' , function( object ){
+      OBJLoader.load( 'models/skull1.obj' , function( object ){
 
       
         object.traverse( function ( child ) {
           if ( child instanceof THREE.Mesh ) {
 
-            var modifier = new THREE.SubdivisionModifier( 3 );
+            console.log( 'YES');
+            var modifier = new THREE.SubdivisionModifier( 1 );
             cockGeo = child.geometry;
             cockGeo.computeFaceNormals();
 
@@ -148,10 +151,12 @@
         }.bind( this ));
 
         onLoad();
-      });*/
+      });
 
 
-      var tones = initTones();
+      if( AUDIO == true ){
+        var tones = initTones();
+      }
 
       function init(){
 
@@ -183,15 +188,21 @@
 
 
 
-        /*
+        if( VR == true ){
+          /*
 
-        VR
-        
-        */
-        controls = new THREE.VRControls( camera );
+          VR
+          
+          */
+          controls = new THREE.VRControls( camera );
 
-		effect = new THREE.VREffect( renderer );
-        effect.setSize( window.innerWidth, window.innerHeight );
+          effect = new THREE.VREffect( renderer );
+          effect.setSize( window.innerWidth, window.innerHeight );
+
+        }else{
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        }
+
 
 
         scene = new THREE.Scene();
@@ -276,13 +287,13 @@
 
         t.updateMatrix();*/
 
-       /* var t = new THREE.Mesh( cockGeo );
+        var t = new THREE.Mesh( cockGeo );
 
-        t.rotation.x = Math.PI / 2.7;
-        t.rotation.y = -Math.PI / 2;
+       // t.rotation.x = Math.PI / 2.7;
+       // t.rotation.y = -Math.PI / 2;
         t.position.z = -.35;
         t.position.y = -.1;
-        t.scale.multiplyScalar( .06 );
+        t.scale.multiplyScalar( .0005 );
         t.updateMatrix();
         var rep = G.fingers.value;
 
@@ -314,21 +325,25 @@
         gem.soul.reset( gem.t_og.value );
         gem.toggle();
 
-        gems.push( gem );*/
+        gems.push( gem );
 
 
         controller.connect();
-        
 
-        looper.start();
-        
-        for( var i =0; i < tones.length; i++ ){
+        if( AUDIO == true ){
 
-          console.log( tones[i] );
-          tones[i].play();
+          looper.start();
+          
+          for( var i =0; i < tones.length; i++ ){
 
-          scene.add( tones[i].mesh );
-        } 
+            console.log( tones[i] );
+            tones[i].play();
+
+            scene.add( tones[i].mesh );
+
+          } 
+
+        }
 
       }
 
@@ -337,7 +352,10 @@
         //counter ++;
         //counter %= 10;
         //if( counter ==  0 ){
-          controls.update();
+          
+          if( VR == true ){
+            controls.update();
+          }
 
           G.dT.value = clock.getDelta();
           G.time.value += G.dT.value;
@@ -347,13 +365,21 @@
           for( var i =0; i < gems.length; i++ ){
             gems[i].update();
           }
-          
-          soundPos.copy( G.fingers.value[4] );
-          soundPos1.copy( G.fingers.value[29] );
-          
-          audioController.update();
-          
-          effect.render( scene, camera );
+
+          if( AUDIO == true ){
+
+            soundPos.copy( G.fingers.value[4] );
+            soundPos1.copy( G.fingers.value[29] );
+            
+            audioController.update();
+
+          }
+
+          if( VR == true ){
+            effect.render( scene, camera );
+          }else{
+            renderer.render( scene , camera );
+          }
 
        // }
         requestAnimationFrame( animate );
@@ -366,8 +392,13 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
 
-        effect.setSize( window.innerWidth , window.innerHeight );
-      //  renderer.setSize( window.innerWidth, window.innerHeight );
+        if( VR == true ){
+
+          effect.setSize( window.innerWidth , window.innerHeight );
+        }else{
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        }
+
 
       }
 
@@ -479,21 +510,15 @@
    
   }
 
-   function leapToScene( frame , position  ){
+  function leapToScene( frame , position  ){
 
 
-   // console.log( position );
-    var p =  position; //frame.interactionBox.normalizePoint( position );
-
-    //p[0] *= .01;
-    //p[1] *= .01;
-    //p[2] *= .01;
-
+    var p =  position;  
     return [ 
       p[0] * .001,
       p[1] * .001,
       p[2] * .001
-    ]//return p;
+    ]
 
   }
 
