@@ -42,7 +42,7 @@
 
       
       var VR = true;
-      var AUDIO = false;
+      var AUDIO = true;
 
       var tv1 = new THREE.Vector3();
       var tv2 = new THREE.Vector3();
@@ -135,18 +135,18 @@
 
       var OBJLoader = new THREE.OBJLoader();
 
-      OBJLoader.load( 'models/skull1.obj' , function( object ){
+      OBJLoader.load( 'models/jesus.obj' , function( object ){
 
       
         object.traverse( function ( child ) {
           if ( child instanceof THREE.Mesh ) {
 
             console.log( 'YES');
-            var modifier = new THREE.SubdivisionModifier( 1 );
-            cockGeo = child.geometry;
-            cockGeo.computeFaceNormals();
+           // var modifier = new THREE.SubdivisionModifier( 1 );
+            modelGeo = child.geometry;
+            modelGeo.computeFaceNormals();
 
-            modifier.modify( cockGeo );
+           // modifier.modify( modelGeo );
                       }
         }.bind( this ));
 
@@ -263,6 +263,8 @@
 
             repulsionPower:     { type:"f" , value: -.0002 , constraints:[-300  , 0] },
             repulsionRadius:     { type:"f" , value: .1 , constraints:[ 0  , 1000] },
+            //dampening:     { type:"f" , value: .8 , constraints:[ 0  , 1000] },
+
           },
 
           body:{
@@ -287,13 +289,13 @@
 
         t.updateMatrix();*/
 
-        var t = new THREE.Mesh( cockGeo );
+        var t = new THREE.Mesh( modelGeo );
 
        // t.rotation.x = Math.PI / 2.7;
        // t.rotation.y = -Math.PI / 2;
         t.position.z = -.35;
         t.position.y = -.1;
-        t.scale.multiplyScalar( .0005 );
+        t.scale.multiplyScalar( .008 );
         t.updateMatrix();
         var rep = G.fingers.value;
 
