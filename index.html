@@ -41,7 +41,7 @@
     <script>
 
       
-      var VR = true;
+      var VR = false;
       var AUDIO = true;
 
       var tv1 = new THREE.Vector3();
@@ -70,6 +70,7 @@
 
       var loaded = 0;
       var neededToLoad = 2;
+      var allLoaded = false;
 
 
 
@@ -92,6 +93,9 @@
         controller.setOptimizeHMD(true);
       }
 
+
+      initThree();
+      animate();
       var shaders = new ShaderLoader( 'shaders' , 'shaderChunks'   );
 
       if( AUDIO == true ){
@@ -158,7 +162,10 @@
         var tones = initTones();
       }
 
-      function init(){
+
+
+      // DONE AT THE BEGINNING, so we can load later
+      function initThree(){
 
         var w = window.innerWidth;
         var h = window.innerHeight;
@@ -181,10 +188,10 @@
        // renderer.setSize( window.innerWidth, window.innerHeight );
 
         document.body.appendChild( renderer.domElement );
-        window.addEventListener( 'resize', onWindowResize , false );
-		document.body.addEventListener( 'dblclick', onDoubleClick , false );
+        /*window.addEventListener( 'resize', onWindowResize , false );
+		    document.body.addEventListener( 'dblclick', onDoubleClick , false );
 
-        document.body.addEventListener("keydown", onKeyDown, true);
+        document.body.addEventListener("keydown", onKeyDown, true);*/
 
 
 
@@ -210,6 +217,16 @@
         //scene.fog = new THREE.Fog( 0x000000 , 1000, 40000 );
 
 
+        loadCube = new THREE.Mesh( 
+            new THREE.BoxGeometry( .04 , .04 , .04 ),
+            new THREE.MeshNormalMaterial()
+        );
+
+        //loadCube.scale.x = 1;
+        loadCube.position.z = -.1;
+
+        scene.add( loadCube );
+
         
         var g = new THREE.IcosahedronGeometry(.005 , 1 );
         var m = new THREE.MeshBasicMaterial({
@@ -233,17 +250,22 @@
 
         }
 
-        t = new THREE.Mesh( new THREE.IcosahedronGeometry( .1 , 5 ) );
 
-        t.position.z = .3;
-
-        t.updateMatrix();
-
-        var rep = G.fingers.value;
-
-        console.log( rep );
+        
+  
+       }
 
 
+
+      /*
+
+
+         SHADERS LOADED
+
+
+      */
+
+      function init(){
         
 
         t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
@@ -338,7 +360,6 @@
           
           for( var i =0; i < tones.length; i++ ){
 
-            console.log( tones[i] );
             tones[i].play();
 
             scene.add( tones[i].mesh );
@@ -346,6 +367,10 @@
           } 
 
         }
+
+
+        // Get the load cube out of here
+        scene.remove( loadCube );
 
       }
 
@@ -364,30 +389,41 @@
           
           updateFingers( controller.frame() );
 
-          for( var i =0; i < gems.length; i++ ){
-            gems[i].update();
-          }
 
-          if( AUDIO == true ){
+          if( allLoaded == true ){
 
-            soundPos.copy( G.fingers.value[4] );
-            soundPos1.copy( G.fingers.value[29] );
-            
-            audioController.update();
 
-          }
+            for( var i =0; i < gems.length; i++ ){
+              gems[i].update();
+            }
 
-          if( VR == true ){
-            effect.render( scene, camera );
+            if( AUDIO == true ){
+
+              soundPos.copy( G.fingers.value[4] );
+              soundPos1.copy( G.fingers.value[29] );
+              
+              audioController.update();
+
+            }
+
           }else{
-            renderer.render( scene , camera );
+  
+            loadCube.rotation.x +=  G.dT.value;
+            loadCube.rotation.y -= .4 * G.dT.value;
+            loadCube.rotation.z += 2. * G.dT.value;
+
           }
+
+         if( VR == true ){
+           effect.render( scene, camera );
+         }else{
+         renderer.render( scene , camera );
+         }
 
        // }
         requestAnimationFrame( animate );
        // renderer.render( scene , camera );
       }
-
        // Resets the renderer to be the proper size
       function onWindowResize(){
 
@@ -526,12 +562,20 @@
 
   function onLoad(){
 
-        loaded ++;
         
+        loaded ++;
+
+        loadCube.scale.x = (loaded / neededToLoad) * 1
+        loadCube.scale.y = (loaded / neededToLoad) * 1
+        loadCube.scale.z = (loaded / neededToLoad) * 1
+       
+         
         if( loaded == neededToLoad ){
+          allLoaded = true;
           init();
-          animate();
         }
+
+
 
       }
 
