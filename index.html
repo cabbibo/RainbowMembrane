@@ -3,10 +3,49 @@
   <head>
     <style>
       body{ margin: 0px; }
+      
+      @font-face {
+        font-family: "GeoSans";
+        src: url( "lib/GeosansLight.ttf" );
+      }
+    
+      html{ color:#fff; background:#000; font-family:"GeoSans" }
+      #links{
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+        padding: 20px;
+       // float: right;
+      }
+      a{
+        color:#fff;
+        opacity: .6;
+        float: right;
+        text-decoration: none;
+      }
+      a:hover{
+        color:#fff;
+        opacity: 1;
+        text-decoration: none;
+      }
+      a img{
+      
+        width:35px;
+        height:35px;
+
+      }
     </style>
   </head>
 
   <body>
+
+
+    <div id="links">
+      <a target="_blank" href="http://twitter.com/share?text=Touch%20the%20Rainbow%20Membrane%20with%20%23WebVR%20and%20@LeapMotion%20(%20Code%20by%20@Cabbibo%20)&url=http://cabbi.bo/RainbowMembrane"><img src="img/twitter_1.png"/></a></br></br></br>
+      <a href="http://webvr.info/">WEBVR</a></br>
+      <a href="http://cabbi.bo/">CABBIBO</a></br>
+      <a href="https://www.leapmotion.com/">LEAP MOTION</a>
+    </div>
 
     <script src = "lib/leap.min.js"               ></script>
     <script src = "lib/three.min.js"              ></script>
@@ -29,6 +68,9 @@
     <script src = "lib/PositionalAudio.js"        ></script>
     <script src = "lib/Loop.js"                   ></script>
     <script src = "lib/Looper.js"                 ></script>
+
+
+    <script src = "lib/TextCreator.js"            ></script>
     
     <script src = "lib/OBJLoader.js"              ></script>
 
@@ -36,7 +78,7 @@
     <script src = "GEM.js"                        ></script>
     <script src = "GUI.js"                        ></script>
 
-    <script src = "initTones.js">                 ></script>
+    <script src = "initTones.js"                  ></script>
 
     <script>
 
